@@ -220,7 +220,12 @@ public extension AudioPlayer {
     }
     func pause() async {
         didPauseAt = .now
-        await captureLocalEvent(type: .paused)
+        // Don't record a redundant .paused event when the sleep timer is the one pausing playback;
+        // the .sleepTimerEnded event is already recorded by sleepTimerDidExpire().
+        let recentSleepTimer = sleepTimerDidExpireAt.map { abs($0.1.timeIntervalSinceNow) < 2 } ?? false
+        if !recentSleepTimer {
+            await captureLocalEvent(type: .paused)
+        }
         await current?.pause()
     }
     

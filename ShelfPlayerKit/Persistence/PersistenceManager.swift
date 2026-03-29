@@ -47,7 +47,7 @@ public final class PersistenceManager: Sendable {
         // try! FileManager.default.removeItem(at: modelConfiguration.url)
         #endif
         
-        modelContainer = try! ModelContainer(for: schema, migrationPlan: nil, configurations: [
+        modelContainer = try! ModelContainer(for: schema, migrationPlan: ShelfPlayerMigrationPlan.self, configurations: [
             modelConfiguration,
         ])
         

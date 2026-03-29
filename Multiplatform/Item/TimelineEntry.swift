@@ -12,7 +12,7 @@ enum AppTimelineEntry: Identifiable {
     case nowPlaying
     case serverSession(SessionPayload)
     case localEvent(LocalPlaybackEvent)
-    case releaseDate(Date)
+    case releaseDate(String)
 
     var id: String {
         switch self {
@@ -22,8 +22,8 @@ enum AppTimelineEntry: Identifiable {
                 "session-\(session.id)"
             case .localEvent(let event):
                 "localEvent-\(event.id.uuidString)"
-            case .releaseDate(let date):
-                "releaseDate-\(date.timeIntervalSince1970)"
+            case .releaseDate(let released):
+                "releaseDate-\(released)"
         }
     }
 
@@ -35,8 +35,8 @@ enum AppTimelineEntry: Identifiable {
                 session.startDate
             case .localEvent(let event):
                 event.timestamp
-            case .releaseDate(let date):
-                date
+            case .releaseDate:
+                .distantPast
         }
     }
 }

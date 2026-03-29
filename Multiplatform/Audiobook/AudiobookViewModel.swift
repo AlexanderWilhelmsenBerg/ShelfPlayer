@@ -28,8 +28,6 @@ final class AudiobookViewModel: Sendable {
     
     var toolbarVisible: Bool
     var bookmarksVisible: Bool
-    var chaptersVisible: Bool
-    var sessionsVisible: Bool
     var supplementaryPDFsVisible: Bool
     
     private(set) var chapters: [Chapter]
@@ -60,8 +58,6 @@ final class AudiobookViewModel: Sendable {
         
         toolbarVisible = false
         bookmarksVisible = false
-        chaptersVisible = false
-        sessionsVisible = false
         supplementaryPDFsVisible = false
         
         chapters = []

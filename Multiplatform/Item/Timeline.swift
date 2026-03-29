@@ -155,8 +155,8 @@ struct Timeline: View {
                                 case .sleepTimerEnded:
                                     row(text: localEventText(event), color: .purple, systemImage: "moon.zzz.fill")
                             }
-                        case .releaseDate(let date):
-                            row(text: Text(verbatim: "item.released \(date)"), color: .green, systemImage: "plus")
+                        case .releaseDate(let released):
+                            row(text: Text("item.released \(released)"), color: .green, systemImage: "plus")
                     }
                 }
             }
@@ -169,9 +169,6 @@ struct Timeline: View {
         }
         .onReceive(RFNotification[.playbackItemChanged].publisher()) { _ in
             sessionLoader.refresh()
-        }
-        .onReceive(RFNotification[.localPlaybackEventRecorded].publisher()) { _ in
-            // Parent view model handles refreshing local events
         }
         .onAppear {
             sessionLoader.refresh()
