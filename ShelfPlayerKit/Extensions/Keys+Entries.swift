@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 import RFNotifications
 
 public extension UserDefaults {
@@ -262,6 +263,8 @@ public extension RFNotification.IsolatedNotification {
     static var reloadImages: IsolatedNotification<ItemIdentifier?> { .init("io.rfk.shelfPlayer.reloadImages") }
     static var listenNowItemsChanged: IsolatedNotification<RFNotificationEmptyPayload> { .init("io.rfk.shelfPlayerKit.listenNowItemsChanged") }
     static var synchronizedPlaybackSessions: IsolatedNotification<RFNotificationEmptyPayload> { .init("io.rfk.shelfPlayerKit.synchronizedPlaybackSessions") }
+
+    static var localPlaybackEventRecorded: IsolatedNotification<LocalPlaybackEvent> { .init("io.rfk.shelfPlayerKit.localPlaybackEventRecorded") }
     
     static var invalidateTabs: IsolatedNotification<RFNotificationEmptyPayload> { .init("io.rfk.shelfPlayerKit.invalidateTabs") }
     static var enablePinnedTabs: IsolatedNotification<RFNotificationEmptyPayload> { .init("io.rfk.shelfPlayerKit.enablePinnedTabs") }

@@ -183,6 +183,7 @@ public extension AudioPlayer {
     }
     
     func stop() async {
+        await captureLocalEvent(type: .stopped)
         await current?.stop()
         current = nil
     }
@@ -190,7 +191,7 @@ public extension AudioPlayer {
         guard current?.id == endpointID else {
             return
         }
-        
+
         await stop()
     }
     
@@ -219,6 +220,7 @@ public extension AudioPlayer {
     }
     func pause() async {
         didPauseAt = .now
+        await captureLocalEvent(type: .paused)
         await current?.pause()
     }
     
@@ -369,7 +371,12 @@ public extension AudioPlayer {
 
 private extension AudioPlayer {
     func sleepTimerDidExpire(configuration: SleepTimerConfiguration) {
-        sleepTimerDidExpireAt = (configuration, .now)
+        let expiredAt = Date.now
+        sleepTimerDidExpireAt = (configuration, expiredAt)
+
+        Task {
+            await captureLocalEvent(type: .sleepTimerEnded, timestamp: expiredAt)
+        }
     }
     
     nonisolated func setupObservers() {
@@ -624,5 +631,40 @@ private extension AudioPlayer {
     
     nonisolated func updateCommandCenterPlaybackRates() {
         MPRemoteCommandCenter.shared().changePlaybackRateCommand.supportedPlaybackRates = Defaults[.playbackRates].map { NSNumber(value: $0) }
+    }
+
+    func captureLocalEvent(type: LocalPlaybackEventType, timestamp: Date = .now) async {
+        guard let itemID = await current?.currentItem.itemID,
+              let currentTime = await current?.currentTime,
+              let duration = await current?.duration else {
+            return
+        }
+
+        let chapterTitle: String?
+
+        if let activeChapterIndex = await current?.activeChapterIndex {
+            chapterTitle = await current?.chapters[activeChapterIndex].title
+        } else {
+            chapterTitle = nil
+        }
+
+        let progressPercentage = duration > 0 ? currentTime / duration : 0
+
+        let event = LocalPlaybackEvent(
+            eventType: type,
+            itemID: itemID,
+            timestamp: timestamp,
+            currentTime: currentTime,
+            duration: duration,
+            chapterTitle: chapterTitle,
+            progressPercentage: progressPercentage
+        )
+
+        do {
+            try await PersistenceManager.shared.localEvents.insert(event)
+            await RFNotification[.localPlaybackEventRecorded].send(payload: event)
+        } catch {
+            logger.error("Failed to capture local playback event: \(error)")
+        }
     }
 }

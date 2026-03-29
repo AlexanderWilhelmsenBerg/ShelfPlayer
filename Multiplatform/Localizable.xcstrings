@@ -967,6 +967,16 @@
         }
       }
     },
+    "chapters" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chapters"
+          }
+        }
+      }
+    },
     "connection.add" : {
       "localizations" : {
         "de" : {
@@ -8948,6 +8958,96 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "合计"
+          }
+        }
+      }
+    },
+    "item.chapters.empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No chapters available"
+          }
+        }
+      }
+    },
+    "item.timeline.event.paused" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused"
+          }
+        }
+      }
+    },
+    "item.timeline.event.stopped" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stopped"
+          }
+        }
+      }
+    },
+    "item.timeline.event.sleepTimerEnded" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep timer ended"
+          }
+        }
+      }
+    },
+    "item.timeline.event.progress %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%% complete"
+          }
+        }
+      }
+    },
+    "item.timeline.event.chapter %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
+    "settings.audiobookDefaultTab" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default audiobook tab"
+          }
+        }
+      }
+    },
+    "settings.audiobookDefaultTab.chapters" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chapters"
+          }
+        }
+      }
+    },
+    "settings.audiobookDefaultTab.timeline" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timeline"
           }
         }
       }

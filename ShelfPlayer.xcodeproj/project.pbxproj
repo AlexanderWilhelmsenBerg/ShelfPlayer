@@ -56,6 +56,8 @@
 		3A4AD9552DBB85C60057349C /* CarPlayItemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4AD9542DBB85C20057349C /* CarPlayItemController.swift */; };
 		3A4DD5B22D2FE45500EBE3EE /* LibraryPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4DD5B12D2FE45100EBE3EE /* LibraryPicker.swift */; };
 		3A4F6E012C8240D7004BADBD /* Timeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4F6E002C8240D7004BADBD /* Timeline.swift */; };
+		3AF000022F00000000000002 /* TimelineEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF000012F00000000000001 /* TimelineEntry.swift */; };
+		3AF000042F00000000000004 /* AudiobookDefaultTabPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF000032F00000000000003 /* AudiobookDefaultTabPreference.swift */; };
 		3A520BE52D2DC5650045CA04 /* ConnectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A520BE42D2DC55E0045CA04 /* ConnectionStore.swift */; };
 		3A520BE72D2DD0740045CA04 /* ConnectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A520BE62D2DD06F0045CA04 /* ConnectionsView.swift */; };
 		3A5295242F06871800FA687B /* TabRouterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5295232F06871800FA687B /* TabRouterViewModel.swift */; };
@@ -369,6 +371,8 @@
 		3A4D31F12EC09F8300838777 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = nl; path = nl.lproj/AppIntentVocabulary.plist; sourceTree = "<group>"; };
 		3A4DD5B12D2FE45100EBE3EE /* LibraryPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryPicker.swift; sourceTree = "<group>"; };
 		3A4F6E002C8240D7004BADBD /* Timeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timeline.swift; sourceTree = "<group>"; };
+		3AF000012F00000000000001 /* TimelineEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEntry.swift; sourceTree = "<group>"; };
+		3AF000032F00000000000003 /* AudiobookDefaultTabPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudiobookDefaultTabPreference.swift; sourceTree = "<group>"; };
 		3A520BE42D2DC55E0045CA04 /* ConnectionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionStore.swift; sourceTree = "<group>"; };
 		3A520BE62D2DD06F0045CA04 /* ConnectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionsView.swift; sourceTree = "<group>"; };
 		3A5295232F06871800FA687B /* TabRouterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabRouterViewModel.swift; sourceTree = "<group>"; };
@@ -877,6 +881,7 @@
 				3A90A6402D9AE268009BDA84 /* CreateLogArchiveButton.swift */,
 				3A94A9012E2FF5C2005EC605 /* ColorSchemePreference.swift */,
 				3AAE3F7A2E1567C2000C483B /* PodcastSortOrderPreference.swift */,
+				3AF000032F00000000000003 /* AudiobookDefaultTabPreference.swift */,
 				3A738A172EACCE3F00C8A210 /* CustomTabValuesPreferences.swift */,
 			);
 			path = Preferences;
@@ -1070,6 +1075,7 @@
 				3A00E9702F00402100CE7462 /* InformationList.swift */,
 				3A102EA92D45112F0075FA0B /* PDFViewer.swift */,
 				3A4F6E002C8240D7004BADBD /* Timeline.swift */,
+				3AF000012F00000000000001 /* TimelineEntry.swift */,
 				3ACB8D0C2DDDB35A005336C0 /* ChaptersList.swift */,
 				3ACB8D0A2DDDAD0E005336C0 /* BookmarksList.swift */,
 				3AAFA5AB2D6D00A9002457C3 /* ProgressTracker.swift */,
@@ -1618,6 +1624,8 @@
 				3A9825E12D4A2AD800A65826 /* QueuePlayButton.swift in Sources */,
 				3A90A6432D9BD01E009BDA84 /* CarPlayPreferences.swift in Sources */,
 				3A4F6E012C8240D7004BADBD /* Timeline.swift in Sources */,
+				3AF000022F00000000000002 /* TimelineEntry.swift in Sources */,
+				3AF000042F00000000000004 /* AudiobookDefaultTabPreference.swift in Sources */,
 				3AA089312B6E306F00773414 /* SeriesList.swift in Sources */,
 				3ACD596C2BE2926F0060A841 /* SerifModifier.swift in Sources */,
 				3A738A1A2EACCE8C00C8A210 /* LibraryEnumerator.swift in Sources */,

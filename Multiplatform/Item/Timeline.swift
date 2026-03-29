@@ -11,14 +11,33 @@ import ShelfPlayback
 
 struct Timeline: View {
     @Environment(Satellite.self) private var satellite
-    
+
     let sessionLoader: SessionLoader
+    var localEvents: [LocalPlaybackEvent] = []
     var item: PlayableItem? = nil
-    
+
     private var isPlaying: Bool {
         satellite.nowPlayingItemID == item?.id
     }
-    
+
+    private var entries: [AppTimelineEntry] {
+        var result = [AppTimelineEntry]()
+
+        for session in sessionLoader.sessions {
+            result.append(.serverSession(session))
+        }
+
+        for event in localEvents {
+            result.append(.localEvent(event))
+        }
+
+        if let audiobook = item as? Audiobook, let released = audiobook.released {
+            result.append(.releaseDate(released))
+        }
+
+        return result.sorted { $0.sortDate > $1.sortDate }
+    }
+
     private func rowText(session: SessionPayload) -> LocalizedStringKey {
         if session.startDate.distance(to: .now) > 60 * 60 * 24 {
             "item.timeline.row \(session.timeListening?.formatted(.duration(unitsStyle: .abbreviated, allowedUnits: [.day, .hour, .minute, .second], maximumUnitCount: 1)) ?? "?") \(session.startDate.formatted(date: .abbreviated, time: .shortened))"
@@ -26,7 +45,26 @@ struct Timeline: View {
             "item.timeline.row \(session.timeListening?.formatted(.duration(unitsStyle: .abbreviated, allowedUnits: [.day, .hour, .minute, .second], maximumUnitCount: 1)) ?? "?") \(session.startDate.formatted(.relative(presentation: .named)))"
         }
     }
-    
+
+    private func localEventText(_ event: LocalPlaybackEvent) -> Text {
+        var parts = [String]()
+
+        if event.timestamp.distance(to: .now) > 60 * 60 * 24 {
+            parts.append(event.timestamp.formatted(date: .abbreviated, time: .shortened))
+        } else {
+            parts.append(event.timestamp.formatted(.relative(presentation: .named)))
+        }
+
+        let percentage = Int((event.progressPercentage * 100).rounded())
+        parts.append(String(format: NSLocalizedString("item.timeline.event.progress %lld", comment: ""), percentage))
+
+        if let chapter = event.chapterTitle {
+            parts.append(String(format: NSLocalizedString("item.timeline.event.chapter %@", comment: ""), chapter))
+        }
+
+        return Text(parts.joined(separator: " · "))
+    }
+
     @ViewBuilder
     private func capsule<Content: View>(title: LocalizedStringKey, isLoading: Bool, @ViewBuilder text: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -34,15 +72,15 @@ struct Timeline: View {
                 text()
                     .bold()
                     .font(.title3)
-                
+
                 Spacer(minLength: 0)
-                
+
                 if isLoading {
                     ProgressView()
                         .scaleEffect(0.5)
                 }
             }
-            
+
             Text(title)
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -54,7 +92,7 @@ struct Timeline: View {
         }
         .accessibilityElement(children: .combine)
     }
-    
+
     @ViewBuilder
     private func row(text: Text, color: Color, systemImage: String) -> some View {
         HStack(spacing: 0) {
@@ -62,21 +100,21 @@ struct Timeline: View {
                 Circle()
                     .fill(color)
                     .frame(width: 26)
-                
+
                 Image(systemName: systemImage)
                     .font(.caption)
                     .foregroundStyle(color.isLight == true ? .black : .white)
             }
             .padding(.trailing, 8)
             .accessibilityHidden(true)
-            
+
             text
                 .font(.caption)
-            
+
             Spacer()
         }
     }
-    
+
     var body: some View {
         VStack(spacing: 12) {
             if !sessionLoader.sessions.isEmpty || sessionLoader.isLoading {
@@ -85,7 +123,7 @@ struct Timeline: View {
                             isLoading: sessionLoader.isLoading) {
                         Text(sessionLoader.totalTimeSpendListening, format: .duration(unitsStyle: .full, allowedUnits: [.day, .hour, .minute], maximumUnitCount: 1))
                     }
-                    
+
                     capsule(title: "item.lastPlayed", isLoading: sessionLoader.mostRecent == nil && sessionLoader.isLoading) {
                         if !isPlaying, let mostRecent = sessionLoader.mostRecent {
                             Text(mostRecent.startDate, style: .relative)
@@ -96,18 +134,30 @@ struct Timeline: View {
                     }
                 }
             }
-            
+
             LazyVStack(spacing: 20) {
                 if isPlaying {
                     row(text: Text("item.timeline.playing"), color: .blue, systemImage: "pause.fill")
                 }
-                
-                ForEach(sessionLoader.sessions) {
-                    row(text: Text(rowText(session: $0)), color: .accentColor, systemImage: "play.fill")
-                }
-                
-                if let audiobook = item as? Audiobook, let released = audiobook.released {
-                    row(text: Text(verbatim: "item.released \(released)"), color: .green, systemImage: "plus")
+
+                ForEach(entries) { entry in
+                    switch entry {
+                        case .nowPlaying:
+                            EmptyView()
+                        case .serverSession(let session):
+                            row(text: Text(rowText(session: session)), color: .accentColor, systemImage: "play.fill")
+                        case .localEvent(let event):
+                            switch event.eventType {
+                                case .paused:
+                                    row(text: localEventText(event), color: .yellow, systemImage: "pause.fill")
+                                case .stopped:
+                                    row(text: localEventText(event), color: .red, systemImage: "stop.fill")
+                                case .sleepTimerEnded:
+                                    row(text: localEventText(event), color: .purple, systemImage: "moon.zzz.fill")
+                            }
+                        case .releaseDate(let date):
+                            row(text: Text(verbatim: "item.released \(date)"), color: .green, systemImage: "plus")
+                    }
                 }
             }
             .background(alignment: .leading) {
@@ -119,6 +169,9 @@ struct Timeline: View {
         }
         .onReceive(RFNotification[.playbackItemChanged].publisher()) { _ in
             sessionLoader.refresh()
+        }
+        .onReceive(RFNotification[.localPlaybackEventRecorded].publisher()) { _ in
+            // Parent view model handles refreshing local events
         }
         .onAppear {
             sessionLoader.refresh()

@@ -8,6 +8,8 @@
 import Foundation
 import SwiftData
 
+public typealias LocalPlaybackEvent = SchemaV3.LocalPlaybackEvent
+
 public enum LocalPlaybackEventType: String, Sendable, Codable {
     case paused
     case stopped
