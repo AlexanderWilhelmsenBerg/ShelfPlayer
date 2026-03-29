@@ -30,9 +30,11 @@ public final class PersistenceManager: Sendable {
     public let customization: CustomizationSubsystem
     
     public let webSocket: WebSocketSubsystem
+
+    public let localEvents: LocalEventSubsystem
     
     private init() {
-        let schema = Schema(versionedSchema: SchemaV2.self)
+        let schema = Schema(versionedSchema: SchemaV3.self)
         
         let modelConfiguration = ModelConfiguration("ShelfPlayerUpdated",
                            schema: schema,
@@ -45,7 +47,7 @@ public final class PersistenceManager: Sendable {
         // try! FileManager.default.removeItem(at: modelConfiguration.url)
         #endif
         
-        modelContainer = try! ModelContainer(for: schema, migrationPlan: nil, configurations: [
+        modelContainer = try! ModelContainer(for: schema, migrationPlan: ShelfPlayerMigrationPlan.self, configurations: [
             modelConfiguration,
         ])
         
@@ -65,6 +67,8 @@ public final class PersistenceManager: Sendable {
         customization = .init()
         
         webSocket = .init()
+
+        localEvents = .init(modelContainer: modelContainer)
     }
     
     public func remove(itemID: ItemIdentifier) async {

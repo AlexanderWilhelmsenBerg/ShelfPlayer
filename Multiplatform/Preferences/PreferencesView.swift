@@ -61,6 +61,8 @@ struct PreferencesView: View {
                     NavigationLink(destination: SleepTimerEditor()) {
                         label("preferences.sleepTimer", systemImage: "clock", color: .orange)
                     }
+
+                    AudiobookDefaultTabPreference()
                 }
                 
                 Section {

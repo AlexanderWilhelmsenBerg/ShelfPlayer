@@ -10,6 +10,11 @@ import SwiftUI
 import OSLog
 import ShelfPlayback
 
+enum AudiobookDetailTab: String, CaseIterable, Codable, Defaults.Serializable {
+    case chapters
+    case timeline
+}
+
 @Observable @MainActor
 final class AudiobookViewModel: Sendable {
     let logger: Logger
@@ -23,8 +28,6 @@ final class AudiobookViewModel: Sendable {
     
     var toolbarVisible: Bool
     var bookmarksVisible: Bool
-    var chaptersVisible: Bool
-    var sessionsVisible: Bool
     var supplementaryPDFsVisible: Bool
     
     private(set) var chapters: [Chapter]
@@ -37,12 +40,16 @@ final class AudiobookViewModel: Sendable {
     private(set) var loadingPDF: Bool
     
     private(set) var bookmarks: [Bookmark]
-    
+
     let sessionLoader: SessionLoader
-    
+    let localEventLoader: LocalEventLoader
+
+    var activeDetailTab: AudiobookDetailTab
+    var userOverrodeTab: Bool
+
     private(set) var notifyError: Bool
     private(set) var notifySuccess: Bool
-    
+
     init(_ audiobook: Audiobook) {
         logger = Logger(subsystem: "io.rfk.shelfPlayer", category: "AudiobookViewModel")
         signposter = OSSignposter(logger: logger)
@@ -51,8 +58,6 @@ final class AudiobookViewModel: Sendable {
         
         toolbarVisible = false
         bookmarksVisible = false
-        chaptersVisible = false
-        sessionsVisible = false
         supplementaryPDFsVisible = false
         
         chapters = []
@@ -65,21 +70,40 @@ final class AudiobookViewModel: Sendable {
         loadingPDF = false
         
         bookmarks = []
-        
+
         sessionLoader = .init(filter: .itemID(audiobook.id))
-        
+        localEventLoader = .init()
+
+        activeDetailTab = Defaults[.audiobookDetailDefaultTab]
+        userOverrodeTab = false
+
         notifyError = false
         notifySuccess = false
-        
+
         RFNotification[.bookmarksChanged].subscribe { [weak self] itemID in
             guard self?.audiobook.id == itemID else {
                 return
             }
-            
+
             Task {
                 await self?.loadBookmarks()
             }
         }
+
+        let audiobookID = audiobook.id
+
+        RFNotification[.playbackItemChanged].subscribe { [weak self] (itemID, _, _) in
+            guard itemID == audiobookID else { return }
+
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                if !userOverrodeTab {
+                    activeDetailTab = .timeline
+                }
+            }
+        }
+
+        localEventLoader.subscribe(for: audiobook.id)
     }
 }
 
@@ -88,18 +112,19 @@ extension AudiobookViewModel {
         Task {
             await withTaskGroup(of: Void.self) {
                 $0.addTask { await self.loadAudiobook() }
-                
+
                 $0.addTask { await self.loadAuthors() }
                 $0.addTask { await self.loadSeries() }
                 $0.addTask { await self.loadNarrators() }
-                
+
                 $0.addTask { await self.loadBookmarks() }
-                
+                $0.addTask { await self.localEventLoader.load(for: self.audiobook.id) }
+
                 if refresh {
                     $0.addTask { await self.sessionLoader.refresh() }
                 }
             }
-            
+
             if refresh {
                 try? await ShelfPlayer.refreshItem(itemID: self.audiobook.id)
                 self.load(refresh: false)

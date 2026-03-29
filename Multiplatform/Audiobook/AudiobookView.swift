@@ -49,24 +49,46 @@ struct AudiobookView: View {
                     .padding(.bottom, 16)
                 }
                 
-                if viewModel.chapters.count > 1 {
-                    DisclosureGroup("item.chapters \(viewModel.chapters.count)", isExpanded: $viewModel.chaptersVisible) {
-                        List {
-                            ChaptersList(itemID: viewModel.audiobook.id, chapters: viewModel.chapters)
+                VStack(spacing: 0) {
+                    Picker("", selection: Binding(
+                        get: { viewModel.activeDetailTab },
+                        set: {
+                            viewModel.activeDetailTab = $0
+                            viewModel.userOverrodeTab = true
                         }
-                        .listStyle(.plain)
-                        .frame(height: minimumHeight * CGFloat(viewModel.chapters.count))
+                    )) {
+                        ForEach(AudiobookDetailTab.allCases, id: \.self) { tab in
+                            Text(LocalizedStringKey(tab.rawValue))
+                                .tag(tab)
+                        }
                     }
-                    .disclosureGroupStyle(BetterDisclosureGroupStyle())
-                    .padding(.bottom, 16)
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 12)
+
+                    switch viewModel.activeDetailTab {
+                        case .chapters:
+                            if viewModel.chapters.count > 1 {
+                                List {
+                                    ChaptersList(itemID: viewModel.audiobook.id, chapters: viewModel.chapters)
+                                }
+                                .listStyle(.plain)
+                                .frame(height: minimumHeight * CGFloat(viewModel.chapters.count))
+                            } else {
+                                Text("item.chapters.empty")
+                                    .foregroundStyle(.secondary)
+                                    .padding(.horizontal, 20)
+                            }
+                        case .timeline:
+                            Timeline(
+                                sessionLoader: viewModel.sessionLoader,
+                                localEvents: viewModel.localEventLoader.events,
+                                item: viewModel.audiobook
+                            )
+                            .padding(.top, 8)
+                            .padding(.horizontal, 20)
+                    }
                 }
-                
-                DisclosureGroup("timeline", isExpanded: $viewModel.sessionsVisible) {
-                    Timeline(sessionLoader: viewModel.sessionLoader, item: viewModel.audiobook)
-                        .padding(.top, 8)
-                        .padding(.horizontal, 20)
-                }
-                .disclosureGroupStyle(BetterDisclosureGroupStyle())
                 .padding(.bottom, 16)
                 
                 if !viewModel.supplementaryPDFs.isEmpty {
